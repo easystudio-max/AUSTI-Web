@@ -3,14 +3,12 @@ import streamlit as st
 st.set_page_config(page_title="AUSTI - AI 사용 성향 검사", page_icon="🌟", layout="centered")
 
 # ==================== 로고 삽입 ====================
-# 로고 파일명을 austi-logo.png로 GitHub에 올렸다면 아래 코드 사용
 st.image("https://raw.githubusercontent.com/easystudio-max/AUSTI-Web/main/austi-logo.png", 
          width=320)
 
 st.title("🌟 AUSTI")
 st.subheader("AI 사용 성향 검사")
 
-# Likert 척도 설명
 st.info("""
 **응답 방법**  
 각 문항을 읽고 자신에게 해당하는 정도를 선택해주세요.
@@ -20,7 +18,7 @@ st.info("""
 """)
 
 name = st.text_input("이름 또는 별명", placeholder="예: 인훈")
-background = st.text_input("직업/전공/분야", placeholder="예: IT계열")
+background = st.text_input("직업/전공/분야", placeholder="예: 공간정보공학")
 
 if st.button("검사 시작하기", type="primary"):
     if not name.strip():
@@ -82,111 +80,22 @@ if 'step' in st.session_state and st.session_state.step == 1:
 
         # ==================== 16개 타입 완전 보고서 ====================
         reports = {
-            "PTRS": {
-                "catch": "너 PTRS야? 혼자서도 완벽한 AI 시스템을 레고처럼 정밀하게 쌓아올리는 마스터!",
-                "desc": "강한 Precision과 Solo 성향으로 혼자서도 체계적이고 오류 없는 고품질 결과를 만들어내는 정밀 건축가 타입입니다.",
-                "strength": "• 오류 제로의 정밀 시스템 구축 능력\n• 혼자서도 안정적이고 완성도 높은 결과물 생산",
-                "weakness": "• 여러 AI를 동시에 활용하는 Swarm 능력이 다소 약함",
-                "tools": "GPT-4o + Claude 4 + Perplexity + Cursor",
-                "growth": "Swarm 모드로 Gemini나 Grok을 추가해 협업 능력을 키워보세요."
-            },
-            "PTRW": {
-                "catch": "너 PTRW야? 여러 AI를 정밀하게 연결해 생산성을 폭발시키는 지휘관!",
-                "desc": "Precision과 Task 성향이 강하면서 Swarm으로 여러 AI를 동시에 조율하는 최고의 전략가 타입입니다.",
-                "strength": "• 다중 AI를 정밀하게 조율해 오류 최소화 + 속도 극대화\n• Task 중심으로 마감 압박에도 안정적",
-                "weakness": "• 한 도구에 깊게 빠지지 않고 넓게 쓰는 경향\n• 도구 관리가 부담스러울 수 있음",
-                "tools": "GPT-4o + Claude 4 + Gemini + Perplexity + Cursor + Zapier",
-                "growth": "가끔 Solo 모드로 GPT-4o나 Claude와 깊이 대화하며 창의성을 키워보세요."
-            },
-            "PTVS": {
-                "catch": "너 PTVS야? 철저한 검증과 정밀 실행으로 신뢰할 수 있는 결과를 만드는 완벽주의자!",
-                "desc": "Precision과 Task, Verify 성향이 강해 정확하고 신뢰할 수 있는 결과를 중시하는 타입입니다.",
-                "strength": "• 높은 정확성과 체계적인 검증 능력",
-                "weakness": "• 창의적 아이디어 탐색이 다소 제한될 수 있음",
-                "tools": "Perplexity + GPT-4o + Claude 4",
-                "growth": "Vision 축을 강화해 Gemini나 Grok으로 장기적 아이디어를 탐색해보세요."
-            },
-            "PFRS": {
-                "catch": "너 PFRS야? 정밀하지만 자연스럽게 흐르는 AI 빌더!",
-                "desc": "Precision과 Flow의 균형이 뛰어난 타입으로, 정확성을 유지하면서 창의적 흐름을 잘 타는 스타일입니다.",
-                "strength": "• 정확성과 창의적 흐름의 좋은 균형",
-                "weakness": "• Swarm 협업이 다소 약함",
-                "tools": "Claude 4 + GPT-4o + Gemini + NotebookLM",
-                "growth": "Swarm 도구를 추가로 활용해보세요."
-            },
-            "PFRW": {
-                "catch": "너 PFRW야? 정밀한 흐름을 여러 AI와 연결하는 창의적 조율자!",
-                "desc": "Precision과 Flow, Swarm 성향이 강한 창의적 조율자 타입입니다.",
-                "strength": "• 창의적 흐름과 다중 AI 조율 능력",
-                "weakness": "• Task 중심의 즉시 실행력이 약할 수 있음",
-                "tools": "Gemini + Grok 3 + Claude 4 + Zapier",
-                "growth": "Task 축을 강화해 아이디어를 빠르게 실행해보세요."
-            },
-            "FFVW": {
-                "catch": "너 FFVW야? 자유로운 흐름과 비전을 여러 AI와 연결하는 창의적 미래 개척자!",
-                "desc": "Flow, Vision, Swarm 성향이 강한 창의적 미래 개척자 타입입니다.",
-                "strength": "• 강력한 창의력과 다중 AI 활용 능력",
-                "weakness": "• Precision과 Task가 다소 약함",
-                "tools": "Gemini + Grok 3 + Midjourney + ZenSpark + Zapier",
-                "growth": "Precision과 Task 축을 강화해 아이디어를 실제 결과물로 연결해보세요."
-            },
-            "FTRS": {
-                "catch": "너 FTRS야? 자유로운 흐름으로 장기적 비전을 추구하는 창의적 솔로 플레이어!",
-                "desc": "Flow와 Vision, Trust, Solo 성향이 강한 창의적 솔로 타입입니다.",
-                "strength": "• 창의적 아이디어 생성 능력\n• 깊이 있는 1:1 대화",
-                "weakness": "• Swarm 협업이 다소 약함",
-                "tools": "Grok 3 + Claude 4 + NotebookLM",
-                "growth": "Swarm 도구를 도입해보세요."
-            },
-            "FTRW": {
-                "catch": "너 FTRW야? 창의적 흐름을 여러 AI와 연결해 비전을 실현하는 혁신가!",
-                "desc": "Flow, Vision, Swarm 성향이 강한 혁신가 타입입니다.",
-                "strength": "• 창의적 아이디어와 다중 AI 조율 능력",
-                "weakness": "• 정밀성과 검증이 다소 약함",
-                "tools": "Grok 3 + Claude 4 + Zapier",
-                "growth": "Precision과 Verify 축을 강화해보세요."
-            },
-            "FTVS": {
-                "catch": "너 FTVS야? 창의적 흐름과 철저한 검증을 병행하는 전략적 창작자!",
-                "desc": "Flow와 Vision, Verify 성향이 강한 전략적 창작자 타입입니다.",
-                "strength": "• 창의성과 검증의 조화",
-                "weakness": "• Swarm 능력이 다소 약함",
-                "tools": "NotebookLM + Perplexity + Grok",
-                "growth": "Swarm 모드를 활용해보세요."
-            },
-            "FTVW": {
-                "catch": "너 FTVW야? 자유로운 흐름과 비전을 여러 AI와 연결하는 미래 지향적 혁신가!",
-                "desc": "Flow, Vision, Swarm 성향이 강한 미래 지향적 혁신가 타입입니다.",
-                "strength": "• 창의적 비전과 다중 AI 활용 능력",
-                "weakness": "• Precision과 Task가 다소 약함",
-                "tools": "Grok 3 + Midjourney + Zapier",
-                "growth": "Precision과 Task 축을 강화해보세요."
-            },
-            "FFRS": {
-                "catch": "너 FFRS야? 자유로운 흐름으로 창의적 비전을 혼자서도 깊이 탐구하는 예술가!",
-                "desc": "Flow, Vision, Solo 성향이 강한 창의적 예술가 타입입니다.",
-                "strength": "• 뛰어난 창의력과 깊이 있는 탐구",
-                "weakness": "• Swarm 협업과 즉시 실행력이 약함",
-                "tools": "Grok 3 + NotebookLM",
-                "growth": "Swarm과 Task 축을 강화해보세요."
-            },
-            "FFRW": {
-                "catch": "너 FFRW야? 자유로운 흐름과 비전을 여러 AI와 연결하는 창의적 에코시스템 마스터!",
-                "desc": "Flow, Vision, Swarm 성향이 강한 창의적 에코시스템 마스터 타입입니다.",
-                "strength": "• 창의적 아이디어와 다중 AI 조율 능력",
-                "weakness": "• Precision과 검증이 다소 약함",
-                "tools": "Grok 3 + Midjourney + Zapier",
-                "growth": "Precision과 Verify 축을 강화해보세요."
-            },
-            "FFVS": {
-                "catch": "너 FFVS야? 창의적 흐름과 비전을 철저히 검증하는 전략적 창작자!",
-                "desc": "Flow, Vision, Verify 성향이 강한 전략적 창작자 타입입니다.",
-                "strength": "• 창의성과 검증의 조화",
-                "weakness": "• Swarm 능력이 다소 약함",
-                "tools": "NotebookLM + Perplexity + Grok",
-                "growth": "Swarm 모드를 활용해보세요."
-            }
-            # 필요하면 나머지 타입도 추가 가능
+            "PTRS": {"catch": "너 PTRS야? 혼자서도 완벽한 AI 시스템을 레고처럼 정밀하게 쌓아올리는 마스터!", "desc": "강한 Precision과 Solo 성향으로 혼자서도 체계적이고 오류 없는 고품질 결과를 만들어내는 정밀 건축가 타입입니다.", "strength": "• 오류 제로의 정밀 시스템 구축 능력\n• 혼자서도 안정적이고 완성도 높은 결과물 생산", "weakness": "• 여러 AI를 동시에 활용하는 Swarm 능력이 다소 약함", "tools": "GPT-4o + Claude 4 + Perplexity + Cursor", "growth": "Swarm 모드로 Gemini나 Grok을 추가해 협업 능력을 키워보세요."},
+            "PTRW": {"catch": "너 PTRW야? 여러 AI를 정밀하게 연결해 생산성을 폭발시키는 지휘관!", "desc": "Precision과 Task 성향이 강하면서 Swarm으로 여러 AI를 동시에 조율하는 최고의 전략가 타입입니다.", "strength": "• 다중 AI를 정밀하게 조율해 오류 최소화 + 속도 극대화\n• Task 중심으로 마감 압박에도 안정적", "weakness": "• 한 도구에 깊게 빠지지 않고 넓게 쓰는 경향\n• 도구 관리가 부담스러울 수 있음", "tools": "GPT-4o + Claude 4 + Gemini + Perplexity + Cursor + Zapier", "growth": "가끔 Solo 모드로 GPT-4o나 Claude와 깊이 대화하며 창의성을 키워보세요."},
+            "PTVS": {"catch": "너 PTVS야? 철저한 검증과 정밀 실행으로 신뢰할 수 있는 결과를 만드는 완벽주의자!", "desc": "Precision과 Task, Verify 성향이 강해 정확하고 신뢰할 수 있는 결과를 중시하는 타입입니다.", "strength": "• 높은 정확성과 체계적인 검증 능력", "weakness": "• 창의적 아이디어 탐색이 다소 제한될 수 있음", "tools": "Perplexity + GPT-4o + Claude 4", "growth": "Vision 축을 강화해 Gemini나 Grok으로 장기적 아이디어를 탐색해보세요."},
+            "PFRS": {"catch": "너 PFRS야? 정밀하지만 자연스럽게 흐르는 AI 빌더!", "desc": "Precision과 Flow의 균형이 뛰어난 타입으로, 정확성을 유지하면서 창의적 흐름을 잘 타는 스타일입니다.", "strength": "• 정확성과 창의적 흐름의 좋은 균형", "weakness": "• Swarm 협업이 다소 약함", "tools": "Claude 4 + GPT-4o + Gemini + NotebookLM", "growth": "Swarm 도구를 추가로 활용해보세요."},
+            "PFRW": {"catch": "너 PFRW야? 정밀한 흐름을 여러 AI와 연결하는 창의적 조율자!", "desc": "Precision과 Flow, Swarm 성향이 강한 창의적 조율자 타입입니다.", "strength": "• 창의적 흐름과 다중 AI 조율 능력", "weakness": "• Task 중심의 즉시 실행력이 약할 수 있음", "tools": "Gemini + Grok 3 + Claude 4 + Zapier", "growth": "Task 축을 강화해 아이디어를 빠르게 실행해보세요."},
+            "FFVW": {"catch": "너 FFVW야? 자유로운 흐름과 비전을 여러 AI와 연결하는 창의적 미래 개척자!", "desc": "Flow, Vision, Swarm 성향이 강한 창의적 미래 개척자 타입입니다.", "strength": "• 강력한 창의력과 다중 AI 활용 능력", "weakness": "• Precision과 Task가 다소 약함", "tools": "Gemini + Grok 3 + Midjourney + ZenSpark + Zapier", "growth": "Precision과 Task 축을 강화해 아이디어를 실제 결과물로 연결해보세요."},
+            "FTRS": {"catch": "너 FTRS야? 자유로운 흐름으로 장기적 비전을 추구하는 창의적 솔로 플레이어!", "desc": "Flow와 Vision, Trust, Solo 성향이 강한 창의적 솔로 타입입니다.", "strength": "• 창의적 아이디어 생성 능력\n• 깊이 있는 1:1 대화", "weakness": "• Swarm 협업이 다소 약함", "tools": "Grok 3 + Claude 4 + NotebookLM", "growth": "Swarm 도구를 도입해보세요."},
+            "FTRW": {"catch": "너 FTRW야? 창의적 흐름을 여러 AI와 연결해 비전을 실현하는 혁신가!", "desc": "Flow, Vision, Swarm 성향이 강한 혁신가 타입입니다.", "strength": "• 창의적 아이디어와 다중 AI 조율 능력", "weakness": "• 정밀성과 검증이 다소 약함", "tools": "Grok 3 + Claude 4 + Zapier", "growth": "Precision과 Verify 축을 강화해보세요."},
+            "FTVS": {"catch": "너 FTVS야? 창의적 흐름과 철저한 검증을 병행하는 전략적 창작자!", "desc": "Flow와 Vision, Verify 성향이 강한 전략적 창작자 타입입니다.", "strength": "• 창의성과 검증의 조화", "weakness": "• Swarm 능력이 다소 약함", "tools": "NotebookLM + Perplexity + Grok", "growth": "Swarm 모드를 활용해보세요."},
+            "FTVW": {"catch": "너 FTVW야? 자유로운 흐름과 비전을 여러 AI와 연결하는 미래 지향적 혁신가!", "desc": "Flow, Vision, Swarm 성향이 강한 미래 지향적 혁신가 타입입니다.", "strength": "• 창의적 비전과 다중 AI 활용 능력", "weakness": "• Precision과 Task가 다소 약함", "tools": "Grok 3 + Midjourney + Zapier", "growth": "Precision과 Task 축을 강화해보세요."},
+            "FFRS": {"catch": "너 FFRS야? 자유로운 흐름으로 창의적 비전을 혼자서도 깊이 탐구하는 예술가!", "desc": "Flow, Vision, Solo 성향이 강한 창의적 예술가 타입입니다.", "strength": "• 뛰어난 창의력과 깊이 있는 탐구", "weakness": "• Swarm 협업과 즉시 실행력이 약함", "tools": "Grok 3 + NotebookLM", "growth": "Swarm과 Task 축을 강화해보세요."},
+            "FFRW": {"catch": "너 FFRW야? 자유로운 흐름과 비전을 여러 AI와 연결하는 창의적 에코시스템 마스터!", "desc": "Flow, Vision, Swarm 성향이 강한 창의적 에코시스템 마스터 타입입니다.", "strength": "• 창의적 아이디어와 다중 AI 조율 능력", "weakness": "• Precision과 검증이 다소 약함", "tools": "Grok 3 + Midjourney + Zapier", "growth": "Precision과 Verify 축을 강화해보세요."},
+            "FFVS": {"catch": "너 FFVS야? 창의적 흐름과 비전을 철저히 검증하는 전략적 창작자!", "desc": "Flow, Vision, Verify 성향이 강한 전략적 창작자 타입입니다.", "strength": "• 창의성과 검증의 조화", "weakness": "• Swarm 능력이 다소 약함", "tools": "NotebookLM + Perplexity + Grok", "growth": "Swarm 모드를 활용해보세요."},
+            "PFRV": {"catch": "너 PFRV야? 정밀한 흐름과 철저한 검증을 병행하는 신중한 빌더!", "desc": "Precision, Flow, Verify 성향이 강한 신중한 빌더 타입입니다.", "strength": "• 정확성과 창의적 흐름, 검증의 좋은 조화", "weakness": "• Swarm 협업이 다소 약함", "tools": "Claude 4 + Perplexity + GPT-4o", "growth": "Swarm 도구를 추가로 활용해보세요."},
+            "PTVW": {"catch": "너 PTVW야? 정밀한 검증과 비전을 동시에 추구하는 전략적 분석가!", "desc": "Precision과 Task, Verify, Vision의 균형이 뛰어난 전략적 분석가 타입입니다.", "strength": "• 정확성과 장기적 비전의 조화", "weakness": "• Swarm 협업이 상대적으로 약함", "tools": "Perplexity + Claude 4 + Grok 3", "growth": "Swarm 도구를 적극 활용해보세요."},
+            "FFRS": {"catch": "너 FFRS야? 자유로운 흐름으로 창의적 비전을 혼자서도 깊이 탐구하는 예술가!", "desc": "Flow, Vision, Solo 성향이 강한 창의적 예술가 타입입니다.", "strength": "• 뛰어난 창의력과 깊이 있는 탐구", "weakness": "• Swarm 협업과 즉시 실행력이 약함", "tools": "Grok 3 + NotebookLM", "growth": "Swarm과 Task 축을 강화해보세요."}
         }
 
         data = reports.get(base_type, {
