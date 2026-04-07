@@ -5,8 +5,21 @@ st.set_page_config(page_title="AUSTI - AI 사용 성향 검사", page_icon="🌟
 st.title("🌟 AUSTI")
 st.subheader("AI 사용 성향 검사")
 
+# ==================== Likert 척도 설명 ====================
+st.markdown("""
+**응답 방법**  
+각 문항을 읽고, **자신에게 해당하는 정도**를 선택해주세요.
+
+**1점** = 전혀 그렇지 않다  
+**2점** = 거의 그렇지 않다  
+**3점** = 보통이다  
+**4점** = 대체로 그렇다  
+**5점** = 매우 그렇다
+""")
+
+# 사용자 정보
 name = st.text_input("이름 또는 별명", placeholder="예: 인훈")
-background = st.text_input("직업/전공/분야", placeholder="예: IT분야")
+background = st.text_input("직업/전공/분야", placeholder="예: 공간정보공학")
 
 if st.button("검사 시작하기", type="primary"):
     if not name.strip():
@@ -53,61 +66,162 @@ if 'step' in st.session_state and st.session_state.step == 1:
             st.session_state.answers.append(ans)
             st.rerun()
     else:
+        # 채점
         final_scores = [6 - s if (i+1) in reverse else s for i, s in enumerate(st.session_state.answers)]
         p = sum(final_scores[0:5]) / 5
         t = sum(final_scores[5:10]) / 5
         r = sum(final_scores[10:15]) / 5
         s = sum(final_scores[15:20]) / 5
 
-        # 강도 판단 (표시용)
-        def get_strength(score):
-            if score <= 2.3:
-                return "강함"
-            elif score >= 3.7:
-                return "강함"
-            else:
-                return "중간"
-
-        # 기본 타입 (대문자) - 보고서용
+        # 기본 타입 (보고서용)
         base_type = ("P" if p <= 3 else "F") + ("T" if t <= 3 else "V") + ("R" if r <= 3 else "V") + ("S" if s <= 3 else "W")
 
-        # 강도 표시용 타입 (대/소문자)
-        p_char = "P" if p <= 2.3 else "p" if p < 3.7 else "F"
-        t_char = "T" if t <= 2.3 else "t" if t < 3.7 else "V"
-        r_char = "R" if r <= 2.3 else "r" if r < 3.7 else "V"
-        s_char = "S" if s <= 2.3 else "s" if s < 3.7 else "W"
-        display_type = p_char + t_char + r_char + s_char
+        # 강도 표시용 타입
+        display_type = ("P" if p <= 2.3 else "p" if p < 3.7 else "F") + \
+                       ("T" if t <= 2.3 else "t" if t < 3.7 else "V") + \
+                       ("R" if r <= 2.3 else "r" if r < 3.7 else "V") + \
+                       ("S" if s <= 2.3 else "s" if s < 3.7 else "W")
 
         st.success("검사 완료되었습니다!")
         st.balloons()
 
         st.subheader(f"📌 당신의 타입: {display_type} ({base_type})")
-        st.caption(f"Precision: {get_strength(p)} | Task: {get_strength(t)} | Trust: {get_strength(r)} | Swarm: {get_strength(s)}")
 
-        # 16개 타입 보고서 데이터베이스 (현재는 주요 타입 위주로 작성, 필요시 더 추가)
+        # ==================== 16개 타입 완전 강화 보고서 ====================
         reports = {
+            "PTRS": {
+                "catch": "너 PTRS야? 혼자서도 완벽한 AI 시스템을 레고처럼 정밀하게 쌓아올리는 마스터!",
+                "desc": "강한 Precision과 Solo 성향으로 혼자서도 높은 완성도의 결과를 만들어내는 정밀 건축가 타입입니다.",
+                "strength": "• 오류 제로의 정밀 시스템 구축\n• 혼자서도 안정적인 고품질 결과물 생산",
+                "weakness": "• 여러 AI를 동시에 활용하는 Swarm 능력이 다소 약함",
+                "tools": "Claude 4 + Cursor + Perplexity + NotebookLM",
+                "growth": "Swarm 모드로 여러 AI를 연결해 협업 연습을 해보세요."
+            },
             "PTRW": {
                 "catch": "너 PTRW야? 여러 AI를 정밀하게 연결해 생산성을 폭발시키는 지휘관!",
-                "desc": "당신은 AI를 **정밀하게 설계된 에코시스템**으로 보는 최고의 전략가입니다. 정확성과 효율을 최우선으로 하면서 여러 AI를 동시에 조율합니다.",
-                "strength": "• 다중 AI 정밀 조율로 오류 최소화\n• Task 중심으로 마감 압박에도 강함",
-                "weakness": "• 한 도구에 깊게 빠지지 않는 경향\n• 도구 관리 부담 가능성",
+                "desc": "Precision과 Task 성향이 강하면서 Swarm으로 여러 AI를 동시에 조율하는 최고의 전략가 타입입니다.",
+                "strength": "• 다중 AI를 정밀하게 조율해 오류 최소화 + 속도 극대화\n• Task 중심으로 마감 압박에도 안정적",
+                "weakness": "• 한 도구에 깊게 빠지지 않고 넓게 쓰는 경향\n• 도구 관리가 부담스러울 수 있음",
                 "tools": "Claude 4 + Grok 3 + Perplexity + Cursor + Zapier",
-                "growth": "가끔 한 AI와 깊이 대화하며 창의성을 키우세요."
+                "growth": "가끔 Solo 모드로 한 AI와 깊이 대화하며 창의성을 키워보세요."
             },
-            "PTRS": {
-                "catch": "너 PTRS야? 혼자서도 완벽한 AI 시스템을 구축하는 정밀 건축가!",
-                "desc": "강한 Precision과 Solo 성향으로 혼자서도 높은 완성도의 결과를 만들어내는 타입입니다.",
-                "strength": "• 정밀하고 안정적인 시스템 구축 능력\n• 혼자서도 고품질 결과 생산",
-                "weakness": "• 여러 AI를 동시에 활용하는 능력이 상대적으로 약함",
-                "tools": "Claude 4 + Cursor + Perplexity + NotebookLM",
-                "growth": "Swarm 모드로 여러 AI를 연결해보세요."
+            "PTVS": {
+                "catch": "너 PTVS야? 철저한 검증과 정밀 실행으로 신뢰할 수 있는 결과를 만드는 완벽주의자!",
+                "desc": "Precision과 Task, Verify 성향이 강해 정확하고 검증된 결과를 중요시하는 타입입니다.",
+                "strength": "• 높은 정확성과 신뢰성\n• 체계적인 검증 프로세스",
+                "weakness": "• 창의적 아이디어 탐색이 다소 제한될 수 있음",
+                "tools": "Perplexity + Claude 4 + Cursor",
+                "growth": "Vision 축을 강화해 장기적 아이디어를 탐색해보세요."
+            },
+            "PTVW": {
+                "catch": "너 PTVW야? 정밀한 검증과 비전을 동시에 추구하는 전략적 분석가!",
+                "desc": "Precision과 Task, Verify, Vision의 균형이 뛰어난 전략적 분석가 타입입니다.",
+                "strength": "• 정확성과 장기적 비전의 조화",
+                "weakness": "• Swarm 협업이 상대적으로 약함",
+                "tools": "Perplexity + Claude 4 + Grok 3",
+                "growth": "Swarm 도구를 적극 활용해보세요."
+            },
+            "PFRS": {
+                "catch": "너 PFRS야? 정밀하지만 자연스럽게 흐르는 AI 빌더!",
+                "desc": "Precision과 Flow의 균형이 뛰어난 희귀 타입으로, 정확성을 유지하면서 창의적 흐름을 잘 타는 스타일입니다.",
+                "strength": "• 정확성과 창의적 흐름의 완벽한 균형",
+                "weakness": "• Swarm 협업이 다소 약함",
+                "tools": "Claude 4 + NotebookLM + Cursor",
+                "growth": "Swarm 도구를 2~3개 추가해 협업 연습을 해보세요."
+            },
+            "PFRW": {
+                "catch": "너 PFRW야? 정밀한 흐름을 여러 AI와 연결하는 창의적 조율자!",
+                "desc": "Precision과 Flow, Swarm 성향이 강한 창의적 조율자 타입입니다.",
+                "strength": "• 창의적 흐름과 다중 AI 조율 능력",
+                "weakness": "• Task 중심의 즉시 실행력이 약할 수 있음",
+                "tools": "Grok 3 + Claude 4 + Zapier",
+                "growth": "Task 축을 강화해 아이디어를 빠르게 실행해보세요."
+            },
+            "PFVS": {
+                "catch": "너 PFVS야? 창의적 흐름과 철저한 검증을 병행하는 균형형 분석가!",
+                "desc": "Flow와 Verify 성향이 강하면서 Precision을 유지하는 타입입니다.",
+                "strength": "• 창의성과 검증의 균형",
+                "weakness": "• Swarm 능력이 다소 약함",
+                "tools": "NotebookLM + Perplexity + Claude",
+                "growth": "Swarm 모드를 적극 활용해보세요."
+            },
+            "PFVW": {
+                "catch": "너 PFVW야? 자유로운 흐름과 비전을 여러 AI와 연결하는 창의적 탐험가!",
+                "desc": "Flow, Vision, Swarm 성향이 강한 자유로운 창의형 타입입니다.",
+                "strength": "• 창의적 아이디어 폭발력과 다중 AI 활용",
+                "weakness": "• 정밀성과 즉시 실행력이 상대적으로 약함",
+                "tools": "Grok 3 + Midjourney + Claude",
+                "growth": "Task와 Precision 축을 강화해보세요."
+            },
+            "FTRS": {
+                "catch": "너 FTRS야? 자유로운 흐름으로 장기적 비전을 추구하는 창의적 솔로 플레이어!",
+                "desc": "Flow와 Vision, Trust, Solo 성향이 강한 창의적 솔로 타입입니다.",
+                "strength": "• 창의적 아이디어 생성 능력\n• 깊이 있는 1:1 대화",
+                "weakness": "• Swarm 협업이 다소 약함",
+                "tools": "Grok 3 + Claude 4 + NotebookLM",
+                "growth": "Swarm 도구를 도입해보세요."
+            },
+            "FTRW": {
+                "catch": "너 FTRW야? 창의적 흐름을 여러 AI와 연결해 비전을 실현하는 혁신가!",
+                "desc": "Flow, Vision, Swarm 성향이 강한 혁신가 타입입니다.",
+                "strength": "• 창의적 아이디어와 다중 AI 조율 능력",
+                "weakness": "• 정밀성과 검증이 다소 약함",
+                "tools": "Grok 3 + Claude 4 + Zapier",
+                "growth": "Precision과 Verify 축을 강화해보세요."
+            },
+            "FTVS": {
+                "catch": "너 FTVS야? 창의적 흐름과 철저한 검증을 병행하는 전략적 창작자!",
+                "desc": "Flow와 Vision, Verify 성향이 강한 전략적 창작자 타입입니다.",
+                "strength": "• 창의성과 검증의 조화",
+                "weakness": "• Swarm 능력이 다소 약함",
+                "tools": "NotebookLM + Perplexity + Grok",
+                "growth": "Swarm 모드를 활용해보세요."
+            },
+            "FTVW": {
+                "catch": "너 FTVW야? 자유로운 흐름과 비전을 여러 AI와 연결하는 미래 지향적 혁신가!",
+                "desc": "Flow, Vision, Swarm 성향이 강한 미래 지향적 혁신가 타입입니다.",
+                "strength": "• 창의적 비전과 다중 AI 활용 능력",
+                "weakness": "• Precision과 Task가 다소 약함",
+                "tools": "Grok 3 + Midjourney + Zapier",
+                "growth": "Precision과 Task 축을 강화해보세요."
+            },
+            "FFRS": {
+                "catch": "너 FFRS야? 자유로운 흐름으로 창의적 비전을 혼자서도 깊이 탐구하는 예술가!",
+                "desc": "Flow, Vision, Solo 성향이 강한 창의적 예술가 타입입니다.",
+                "strength": "• 뛰어난 창의력과 깊이 있는 탐구",
+                "weakness": "• Swarm 협업과 즉시 실행력이 약함",
+                "tools": "Grok 3 + NotebookLM",
+                "growth": "Swarm과 Task 축을 강화해보세요."
+            },
+            "FFRW": {
+                "catch": "너 FFRW야? 자유로운 흐름과 비전을 여러 AI와 연결하는 창의적 에코시스템 마스터!",
+                "desc": "Flow, Vision, Swarm 성향이 강한 창의적 에코시스템 마스터 타입입니다.",
+                "strength": "• 창의적 아이디어와 다중 AI 조율 능력",
+                "weakness": "• Precision과 검증이 다소 약함",
+                "tools": "Grok 3 + Midjourney + Zapier",
+                "growth": "Precision과 Verify 축을 강화해보세요."
+            },
+            "FFVS": {
+                "catch": "너 FFVS야? 창의적 흐름과 비전을 철저히 검증하는 전략적 창작자!",
+                "desc": "Flow, Vision, Verify 성향이 강한 전략적 창작자 타입입니다.",
+                "strength": "• 창의성과 검증의 조화",
+                "weakness": "• Swarm 능력이 다소 약함",
+                "tools": "NotebookLM + Perplexity + Grok",
+                "growth": "Swarm 모드를 활용해보세요."
+            },
+            "FFVW": {
+                "catch": "너 FFVW야? 자유로운 흐름과 비전을 여러 AI와 연결하는 창의적 미래 개척자!",
+                "desc": "Flow, Vision, Swarm 성향이 강한 창의적 미래 개척자 타입입니다.",
+                "strength": "• 강력한 창의력과 다중 AI 활용 능력",
+                "weakness": "• Precision과 Task가 다소 약함",
+                "tools": "Grok 3 + Midjourney + Zapier",
+                "growth": "Precision과 Task 축을 강화해보세요."
             }
-            # 여기에 나머지 14개 타입도 추가 가능
         }
 
         data = reports.get(base_type, {
-            "catch": f"너 {base_type}야? AI를 활용하는 독특한 스타일!",
-            "desc": f"{base_type} 타입은 AI를 자신만의 방식으로 효과적으로 활용하는 스타일입니다.",
+            "catch": f"너 {base_type}야? AI를 자신만의 방식으로 활용하는 독특한 스타일!",
+            "desc": f"{base_type} 타입은 AI를 효과적으로 활용하는 독특한 패턴을 가지고 있습니다.",
             "strength": "강점 분석 중",
             "weakness": "약점 분석 중",
             "tools": "추천 도구 준비 중",
