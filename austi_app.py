@@ -18,7 +18,7 @@ st.info("""
 """)
 
 name = st.text_input("이름 또는 별명", placeholder="예: 인훈")
-background = st.text_input("직업/전공/분야", placeholder="예: 공간정보공학")
+background = st.text_input("직업/전공/분야", placeholder="예: IT계열")
 
 if st.button("검사 시작하기", type="primary"):
     if not name.strip():
