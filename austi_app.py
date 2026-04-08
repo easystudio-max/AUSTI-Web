@@ -2,51 +2,33 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 import uuid
-import gspread
-from google.oauth2.service_account import Credentials
 
 st.set_page_config(page_title="AUSTI - AI 사용 성향 검사", page_icon="🌟", layout="centered")
 
 st.image("https://raw.githubusercontent.com/easystudio-max/AUSTI-Web/main/austi-logo.png", width=320)
 
 st.title("🌟 AUSTI")
-st.subheader("AI 사용 성향 검사")
-
-@st.cache_resource
-def get_google_sheet():
-    try:
-        credentials = Credentials.from_service_account_info(
-            st.secrets["gcp_service_account"],
-            scopes=["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-        )
-        gc = gspread.authorize(credentials)
-        # Spreadsheet ID로 직접 열기 (더 안정적)
-        return gc.open_by_key("1lteRFWcisLGq7ZvMz3QQCdv_J3wB_rreSaCJEksI0hk").sheet1
-    except Exception as e:
-        st.error(f"Google Sheets 연결 실패: {e}")
-        st.info("5~10분 후 다시 시도해보세요. (Google 권한 적용에 시간이 걸릴 수 있습니다)")
-        return None
+st.subheader("AI Usage Style Tendency Indicator Test")
 
 if 'step' not in st.session_state:
     st.session_state.step = 0
 
-# Step 0: 연구 동의서
+# Step 0: 시작 화면
 if st.session_state.step == 0:
-    st.subheader("📜 연구 참여 동의서")
-    st.write("본 검사는 충북보건과학대학교 글로벌IT학과 정인훈 교수 연구를 위한 것입니다. 모든 데이터는 익명 처리되어 학술 목적으로만 사용됩니다.")
-    consent = st.checkbox("위 내용을 이해하였으며, 연구 참여에 동의합니다.", value=False)
-    
     name = st.text_input("이름 또는 별명", placeholder="예: 인훈")
     background = st.text_input("직업/전공/분야", placeholder="예: 공간정보공학")
     
-    if st.button("동의하고 검사 시작하기", type="primary") and consent:
-        st.session_state.name = name.strip() if name.strip() else f"익명_{uuid.uuid4().hex[:6]}"
-        st.session_state.background = background.strip()
-        st.session_state.answers = []
-        st.session_state.step = 1
-        st.rerun()
+    if st.button("검사 시작하기", type="primary"):
+        if not name.strip():
+            st.error("이름을 입력해주세요.")
+        else:
+            st.session_state.name = name.strip()
+            st.session_state.background = background.strip()
+            st.session_state.answers = []
+            st.session_state.step = 1
+            st.rerun()
 
-# Step 1: AUSTI 검사
+# Step 1: 검사
 elif st.session_state.step == 1:
     questions = [
         "1. AI에게 지시할 때 세부 단계와 예시를 반드시 포함한다.", "2. AI와 대화할 때 자유로운 아이디어 폭발을 즐긴다.",
@@ -121,9 +103,9 @@ elif st.session_state.step == 2:
         st.session_state.step = 3
         st.rerun()
 
-# Step 3: 추가 설문 + Google Sheets 저장
+# Step 3: 추가 설문 + CSV 다운로드
 elif st.session_state.step == 3:
-    st.subheader("📋 연구용 추가 설문")
+    st.subheader("📋 추가 설문")
     age = st.selectbox("연령대", ["18세 이하", "19~29세", "30~39세", "40~49세", "50세 이상"])
     gender = st.selectbox("성별", ["남성", "여성", "기타", "응답 안함"])
     ai_freq = st.selectbox("AI 도구 사용 빈도", ["매일 사용", "주 3회 이상", "주 1~2회", "월 1회 이하", "거의 사용 안 함"])
@@ -132,36 +114,33 @@ elif st.session_state.step == 3:
     feedback = st.text_area("AUSTI 검사에 대한 자유로운 의견이나 개선점")
 
     if st.button("모든 데이터 제출하기", type="primary"):
-        sheet = get_google_sheet()
-        if sheet is None:
-            st.error("Google Sheets 연결에 실패했습니다. 5~10분 후 다시 시도해주세요.")
-        else:
-            data = {
-                "unique_id": f"AUSTI-{datetime.now().strftime('%Y%m%d%H%M%S')}",
-                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                "name": st.session_state.name,
-                "background": st.session_state.background,
-                "type": st.session_state.test_type,
-                "p_score": round(sum(st.session_state.final_scores[0:5])/5, 2),
-                "t_score": round(sum(st.session_state.final_scores[5:10])/5, 2),
-                "r_score": round(sum(st.session_state.final_scores[10:15])/5, 2),
-                "s_score": round(sum(st.session_state.final_scores[15:20])/5, 2),
-                "age": age,
-                "gender": gender,
-                "ai_freq": ai_freq,
-                "main_tools": ", ".join(main_tools),
-                "usefulness": usefulness,
-                "feedback": feedback,
-                "consent": True
-            }
-            sheet.append_row(list(data.values()))
-            st.success("✅ 데이터가 Google Sheets에 성공적으로 저장되었습니다!")
-            st.session_state.step = 4
-            st.rerun()
+        data = {
+            "이름": st.session_state.name,
+            "배경": st.session_state.background,
+            "타입": st.session_state.test_type,
+            "연령대": age,
+            "성별": gender,
+            "AI 사용 빈도": ai_freq,
+            "주요 도구": ", ".join(main_tools),
+            "유용성": usefulness,
+            "피드백": feedback,
+            "제출시간": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+        df = pd.DataFrame([data])
+        csv = df.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="📥 검사·설문 결과 CSV 다운로드",
+            data=csv,
+            file_name=f"AUSTI_결과_{st.session_state.name}_{datetime.now().strftime('%Y%m%d')}.csv",
+            mime="text/csv"
+        )
+        st.success("✅ 데이터가 저장되었습니다! CSV 파일을 다운로드하세요.")
+        st.session_state.step = 4
+        st.rerun()
 
 # Step 4: 감사 페이지
 elif st.session_state.step == 4:
-    st.success("🎉 모든 검사가 완료되었습니다! 연구에 큰 도움이 됩니다.")
+    st.success("🎉 모든 검사가 완료되었습니다! 감사합니다. CSV 파일을 카카오톡이나 easystudio@naver.com으로 보내주세요~!!")
     st.balloons()
     if st.button("처음부터 다시 시작하기"):
         st.session_state.clear()
