@@ -13,7 +13,7 @@ st.subheader("AI 사용 성향 검사")
 if 'step' not in st.session_state:
     st.session_state.step = 0
 
-# Step 0: 시작
+# Step 0: 시작 화면
 if st.session_state.step == 0:
     name = st.text_input("이름 또는 별명", placeholder="예: 인훈")
     background = st.text_input("직업/전공/분야", placeholder="예: 공간정보공학")
@@ -28,7 +28,7 @@ if st.session_state.step == 0:
             st.session_state.step = 1
             st.rerun()
 
-# Step 1: 검사
+# Step 1: 검사 (20문항)
 elif st.session_state.step == 1:
     questions = [
         "1. AI에게 지시할 때 세부 단계와 예시를 반드시 포함한다.", "2. AI와 대화할 때 자유로운 아이디어 폭발을 즐긴다.",
