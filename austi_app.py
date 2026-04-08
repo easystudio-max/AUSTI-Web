@@ -6,7 +6,7 @@ st.set_page_config(page_title="AUSTI - AI 사용 성향 검사", page_icon="🌟
 st.image("https://raw.githubusercontent.com/easystudio-max/AUSTI-Web/main/austi-logo.png", width=320)
 
 st.title("🌟 AUSTI")
-st.subheader("AI 사용 성향 검사")
+st.subheader("AI Usage Style Tendency Indicator")
 
 st.info("""
 **응답 방법**  
