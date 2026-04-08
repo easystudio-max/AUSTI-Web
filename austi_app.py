@@ -82,7 +82,7 @@ elif st.session_state.step == 1:
         st.session_state.step = 2
         st.rerun()
 
-# Step 2: 16개 타입 보고서
+# Step 2: 타입별 결과 보고서 (16개 모두)
 elif st.session_state.step == 2:
     reports = {
         "PTRS": {"catch": "정밀 실행 신뢰 솔로형", "desc": "AI에게 매우 구체적이고 구조적인 지시를 주며, 혼자서도 오류 없이 완성도 높은 결과를 만들어냅니다.", "strength": "• 높은 정확도와 완성도\n• 혼자서도 체계적인 작업 가능", "weakness": "• 여러 AI를 동시에 활용하는 데 익숙하지 않을 수 있음", "tools": "Claude 4 + GPT-4o + Cursor + Perplexity", "growth": "Swarm 모드로 Gemini나 Grok을 추가해 협업 능력을 키워보세요."},
@@ -105,7 +105,7 @@ elif st.session_state.step == 2:
 
     data = reports.get(st.session_state.test_type, {"catch": "독특한 AI 활용자형", "desc": "AI를 자신만의 방식으로 활용하는 독특한 패턴을 가지고 있습니다.", "strength": "강점 분석 중", "weakness": "약점 분석 중", "tools": "추천 도구 준비 중", "growth": "성장 포인트 준비 중"})
 
-    st.markdown(f"### 💬 {data['catch']}")
+    st.subheader(f"📌 당신의 타입: {st.session_state.test_type} - {data['catch']}")
     st.info(data['desc'])
     st.success(f"**강점**\n{data['strength']}")
     st.warning(f"**약점**\n{data['weakness']}")
@@ -127,28 +127,33 @@ elif st.session_state.step == 3:
     feedback = st.text_area("AUSTI 검사에 대한 자유로운 의견이나 개선점")
 
     if st.button("모든 데이터 제출하기", type="primary"):
-        sheet = get_google_sheet()
-        data = {
-            "unique_id": f"AUSTI-{datetime.now().strftime('%Y%m%d%H%M%S')}",
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "name": st.session_state.name,
-            "background": st.session_state.background,
-            "type": st.session_state.test_type,
-            "p_score": round(sum(st.session_state.final_scores[0:5])/5, 2),
-            "t_score": round(sum(st.session_state.final_scores[5:10])/5, 2),
-            "r_score": round(sum(st.session_state.final_scores[10:15])/5, 2),
-            "s_score": round(sum(st.session_state.final_scores[15:20])/5, 2),
-            "age": age,
-            "gender": gender,
-            "ai_freq": ai_freq,
-            "main_tools": ", ".join(main_tools),
-            "usefulness": usefulness,
-            "feedback": feedback,
-            "consent": True
-        }
-        sheet.append_row(list(data.values()))
-        st.session_state.step = 4
-        st.rerun()
+        try:
+            sheet = get_google_sheet()
+            data = {
+                "unique_id": f"AUSTI-{datetime.now().strftime('%Y%m%d%H%M%S')}",
+                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "name": st.session_state.name,
+                "background": st.session_state.background,
+                "type": st.session_state.test_type,
+                "p_score": round(sum(st.session_state.final_scores[0:5])/5, 2),
+                "t_score": round(sum(st.session_state.final_scores[5:10])/5, 2),
+                "r_score": round(sum(st.session_state.final_scores[10:15])/5, 2),
+                "s_score": round(sum(st.session_state.final_scores[15:20])/5, 2),
+                "age": age,
+                "gender": gender,
+                "ai_freq": ai_freq,
+                "main_tools": ", ".join(main_tools),
+                "usefulness": usefulness,
+                "feedback": feedback,
+                "consent": True
+            }
+            sheet.append_row(list(data.values()))
+            st.success("✅ 데이터가 Google Sheets에 저장되었습니다!")
+            st.session_state.step = 4
+            st.rerun()
+        except Exception as e:
+            st.error(f"데이터 저장 중 오류가 발생했습니다: {e}")
+            st.info("5~10분 후 다시 시도해보세요. (권한 적용 지연일 수 있습니다)")
 
 # Step 4: 감사 페이지
 elif st.session_state.step == 4:
