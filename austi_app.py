@@ -28,7 +28,7 @@ if st.session_state.step == 0:
             st.session_state.step = 1
             st.rerun()
 
-# Step 1: 검사 (20문항)
+# Step 1: 검사
 elif st.session_state.step == 1:
     questions = [
         "1. AI에게 지시할 때 세부 단계와 예시를 반드시 포함한다.", "2. AI와 대화할 때 자유로운 아이디어 폭발을 즐긴다.",
