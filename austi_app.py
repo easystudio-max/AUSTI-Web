@@ -30,7 +30,7 @@ if st.session_state.step == 0:
     consent = st.checkbox("위 내용을 이해하였으며, 연구 참여에 동의합니다.", value=False)
     
     name = st.text_input("이름 또는 별명", placeholder="예: 인훈")
-    background = st.text_input("직업/전공/분야", placeholder="예: IT계열열")
+    background = st.text_input("직업/전공/분야", placeholder="예: IT계열")
     
     if st.button("동의하고 검사 시작하기", type="primary") and consent:
         st.session_state.name = name.strip() if name.strip() else f"익명_{uuid.uuid4().hex[:6]}"
