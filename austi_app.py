@@ -13,7 +13,7 @@ st.subheader("AI 사용 성향 검사")
 if 'step' not in st.session_state:
     st.session_state.step = 0
 
-# Step 0: 시작 화면
+# Step 0: 시작
 if st.session_state.step == 0:
     name = st.text_input("이름 또는 별명", placeholder="예: 인훈")
     background = st.text_input("직업/전공/분야", placeholder="예: 공간정보공학")
@@ -103,7 +103,7 @@ elif st.session_state.step == 2:
         st.session_state.step = 3
         st.rerun()
 
-# Step 3: 추가 설문
+# Step 3: 추가 설문 + CSV 다운로드
 elif st.session_state.step == 3:
     st.subheader("📋 추가 설문")
     age = st.selectbox("연령대", ["18세 이하", "19~29세", "30~39세", "40~49세", "50세 이상"])
@@ -131,10 +131,10 @@ elif st.session_state.step == 3:
         st.download_button(
             label="📥 검사·설문 결과 CSV 다운로드",
             data=csv,
-            file_name=f"AUSTI_결과_{st.session_state.name}.csv",
+            file_name=f"AUSTI_결과_{st.session_state.name}_{datetime.now().strftime('%Y%m%d')}.csv",
             mime="text/csv"
         )
-        st.success("✅ 데이터가 저장되었습니다!")
+        st.success("✅ 데이터가 저장되었습니다! CSV 파일을 다운로드하세요.")
         st.session_state.step = 4
         st.rerun()
 
