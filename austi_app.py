@@ -12,7 +12,6 @@ st.image("https://raw.githubusercontent.com/easystudio-max/AUSTI-Web/main/austi-
 st.title("🌟 AUSTI")
 st.subheader("AI 사용 성향 검사")
 
-# ==================== Google Sheets 연결 ====================
 @st.cache_resource
 def get_google_sheet():
     credentials = Credentials.from_service_account_info(
@@ -25,14 +24,13 @@ def get_google_sheet():
 if 'step' not in st.session_state:
     st.session_state.step = 0
 
-# Step 0: 연구 동의서
 if st.session_state.step == 0:
     st.subheader("📜 연구 참여 동의서")
     st.write("본 검사는 충북보건과학대학교 글로벌IT학과 정인훈 교수 연구를 위한 것입니다. 모든 데이터는 익명 처리되어 학술 목적으로만 사용됩니다.")
     consent = st.checkbox("위 내용을 이해하였으며, 연구 참여에 동의합니다.", value=False)
     
     name = st.text_input("이름 또는 별명", placeholder="예: 인훈")
-    background = st.text_input("직업/전공/분야", placeholder="예: 공간정보공학")
+    background = st.text_input("직업/전공/분야", placeholder="예: IT계열열")
     
     if st.button("동의하고 검사 시작하기", type="primary") and consent:
         st.session_state.name = name.strip() if name.strip() else f"익명_{uuid.uuid4().hex[:6]}"
@@ -41,7 +39,6 @@ if st.session_state.step == 0:
         st.session_state.step = 1
         st.rerun()
 
-# Step 1: AUSTI 검사
 elif st.session_state.step == 1:
     questions = [
         "1. AI에게 지시할 때 세부 단계와 예시를 반드시 포함한다.", "2. AI와 대화할 때 자유로운 아이디어 폭발을 즐긴다.",
@@ -81,8 +78,41 @@ elif st.session_state.step == 1:
         st.session_state.step = 2
         st.rerun()
 
-# Step 2: 연구용 추가 설문
 elif st.session_state.step == 2:
+    # ==================== 16개 타입 완전 보고서 ====================
+    reports = {
+        "PTRS": {"catch": "정밀 실행 신뢰 솔로형", "desc": "AI에게 매우 구체적이고 구조적인 지시를 주며, 혼자서도 오류 없이 완성도 높은 결과를 만들어냅니다.", "strength": "• 높은 정확도와 완성도\n• 혼자서도 체계적인 작업 가능", "weakness": "• 여러 AI를 동시에 활용하는 데 익숙하지 않을 수 있음", "tools": "Claude 4 + GPT-4o + Cursor + Perplexity", "growth": "Swarm 모드로 Gemini나 Grok을 추가해 협업 능력을 키워보세요."},
+        "PTRW": {"catch": "정밀 실행 신뢰 스웜형", "desc": "정밀한 지시와 실행력을 바탕으로 여러 AI를 동시에 조율합니다.", "strength": "• 다중 AI 정밀 조율\n• 마감 압박에도 안정적", "weakness": "• 한 도구에 깊게 빠지지 않고 넓게 쓰는 경향", "tools": "GPT-4o + Claude 4 + Gemini + Zapier + Notion AI", "growth": "가끔 Solo 모드로 Claude와 깊이 대화하며 창의성을 키워보세요."},
+        "PTCS": {"catch": "정밀 실행 검증 솔로형", "desc": "정밀한 지시와 철저한 검증을 혼자서 해내는 신중한 분석가입니다.", "strength": "• 최고 수준의 정확성과 신뢰성", "weakness": "• 창의적 아이디어 탐색이 다소 제한될 수 있음", "tools": "Perplexity + Claude 4 + Felo + GPT-4o", "growth": "Insight 축을 강화해 장기적 비전을 탐색해보세요."},
+        "PTCW": {"catch": "정밀 실행 검증 스웜형", "desc": "정밀한 실행과 검증을 여러 AI와 연결해 최적의 결과를 도출합니다.", "strength": "• 철저한 검증 + 다중 AI 활용", "weakness": "• 창의적 통찰이 상대적으로 약함", "tools": "Perplexity + Claude 4 + Grok 3 + Zapier + Felo", "growth": "Insight 축을 강화해 장기적 아이디어를 탐색해보세요."},
+        "PIRS": {"catch": "통찰 실행 신뢰 솔로형", "desc": "통찰력 있는 큰 그림을 정밀하게 실행하며, 혼자서도 깊이 있는 AI 결과를 만들어냅니다.", "strength": "• 깊이 있는 통찰 + 정밀 실행", "weakness": "• Swarm 협업이 다소 약함", "tools": "Claude 4 + NotebookLM + Notion AI + GPT-4o", "growth": "Swarm 도구를 도입해 협업 능력을 키워보세요."},
+        "PIRW": {"catch": "통찰 실행 신뢰 스웜형", "desc": "통찰을 바탕으로 여러 AI를 연결해 큰 그림을 실현하는 미래 지향적 건축가입니다.", "strength": "• 통찰과 다중 AI 조율의 완벽 조화", "weakness": "• 즉시 실행력이 다소 약할 수 있음", "tools": "Grok 3 + Claude 4 + Gemini + Notion AI + Zapier", "growth": "Task 축을 강화해 아이디어를 빠르게 실행해보세요."},
+        "PICS": {"catch": "통찰 실행 검증 솔로형", "desc": "통찰과 검증을 동시에 추구하며 혼자서도 신뢰할 수 있는 AI 결과를 만드는 타입입니다.", "strength": "• 통찰과 철저한 검증의 균형", "weakness": "• Swarm 능력이 다소 약함", "tools": "NotebookLM + Perplexity + Claude + Felo", "growth": "Swarm 모드를 적극 활용해보세요."},
+        "PICW": {"catch": "통찰 실행 검증 스웜형", "desc": "통찰과 검증을 바탕으로 여러 AI를 연결해 새로운 가능성을 여는 전략적 혁신가입니다.", "strength": "• 통찰 + 검증 + 다중 AI", "weakness": "• Task 중심 실행력이 약할 수 있음", "tools": "Perplexity + Grok 3 + Claude 4 + Zapier + Felo", "growth": "Task 축을 강화해 아이디어를 빠르게 실행해보세요."},
+        "FTRS": {"catch": "자유로운 통찰 신뢰 솔로형", "desc": "자유로운 흐름과 통찰로 혼자서도 창의적이고 깊이 있는 AI 결과를 만들어내는 예술가형입니다.", "strength": "• 뛰어난 창의력과 깊이 있는 탐구", "weakness": "• Swarm 협업과 즉시 실행력이 약함", "tools": "Grok 3 + NotebookLM + Canva AI + Notion AI", "growth": "Swarm과 Task 축을 강화해 아이디어를 실행으로 연결해보세요."},
+        "FTRW": {"catch": "자유로운 통찰 신뢰 스웜형", "desc": "자유로운 흐름을 여러 AI와 연결해 혁신적인 비전을 실현하는 창의적 혁신가입니다.", "strength": "• 창의적 아이디어와 다중 AI 조율", "weakness": "• 정밀성과 검증이 다소 약함", "tools": "Grok 3 + Claude 4 + ZenSpark + Zapier + Notion AI", "growth": "Precision과 Check 축을 강화해보세요."},
+        "FTCS": {"catch": "자유로운 통찰 검증 솔로형", "desc": "자유로운 흐름과 철저한 검증을 병행하는 전략적 창작자입니다.", "strength": "• 창의성과 검증의 조화", "weakness": "• Swarm 능력이 다소 약함", "tools": "NotebookLM + Perplexity + Grok + Canva AI", "growth": "Swarm 모드를 활용해보세요."},
+        "FTCW": {"catch": "자유로운 통찰 검증 스웜형", "desc": "자유로운 흐름을 검증하며 여러 AI를 연결하는 미래 지향적 혁신가입니다.", "strength": "• 창의적 비전과 다중 AI 활용", "weakness": "• Precision과 Task가 다소 약함", "tools": "Grok 3 + Midjourney + ZenSpark + Zapier + Felo", "growth": "Precision과 Task 축을 강화해보세요."},
+        "FIRS": {"catch": "자유로운 통찰 신뢰 솔로형", "desc": "통찰과 자유로운 흐름으로 혼자서도 깊이 있는 창의성을 발휘합니다.", "strength": "• 뛰어난 창의력과 깊이 있는 탐구", "weakness": "• Swarm 협업과 즉시 실행력이 약함", "tools": "Grok 3 + NotebookLM + Canva AI + Notion AI", "growth": "Swarm과 Task 축을 강화해보세요."},
+        "FIRW": {"catch": "자유로운 통찰 신뢰 스웜형", "desc": "통찰을 바탕으로 여러 AI를 연결해 미래를 개척하는 창의적 에코시스템 마스터입니다.", "strength": "• 창의적 통찰과 다중 AI 조율", "weakness": "• Precision과 검증이 다소 약함", "tools": "Grok 3 + Midjourney + ZenSpark + Zapier + Notion AI", "growth": "Precision과 Check 축을 강화해보세요."},
+        "FICS": {"catch": "자유로운 통찰 검증 솔로형", "desc": "통찰과 검증을 자유롭게 활용하는 전략적 창의가입니다.", "strength": "• 창의성과 검증의 완벽 조화", "weakness": "• Swarm 능력이 다소 약함", "tools": "NotebookLM + Perplexity + Grok + Canva AI", "growth": "Swarm 모드를 활용해보세요."},
+        "FICW": {"catch": "자유로운 통찰 검증 스웜형", "desc": "통찰과 검증을 바탕으로 여러 AI를 연결해 새로운 가능성을 여는 미래 개척자입니다.", "strength": "• 통찰 + 검증 + 다중 AI", "weakness": "• Task 중심 실행력이 약할 수 있음", "tools": "Grok 3 + Perplexity + ZenSpark + Zapier + Felo", "growth": "Task 축을 강화해 아이디어를 빠르게 실행해보세요."}
+    }
+
+    data = reports.get(st.session_state.test_type, {"catch": "독특한 AI 활용자형", "desc": "AI를 자신만의 방식으로 활용하는 독특한 패턴을 가지고 있습니다.", "strength": "강점 분석 중", "weakness": "약점 분석 중", "tools": "추천 도구 준비 중", "growth": "성장 포인트 준비 중"})
+
+    st.markdown(f"### 💬 {data['catch']}")
+    st.info(data['desc'])
+    st.success(f"**강점**\n{data['strength']}")
+    st.warning(f"**약점**\n{data['weakness']}")
+    st.markdown(f"**🔥 추천 AI 도구 조합**\n{data['tools']}")
+    st.markdown(f"**📈 성장 포인트**\n{data['growth']}")
+
+    st.session_state.step = 2
+    st.rerun()
+
+elif st.session_state.step == 2:
+    # 연구용 추가 설문 (이전 코드와 동일)
     st.subheader("📋 연구용 추가 설문")
     age = st.selectbox("연령대", ["18세 이하", "19~29세", "30~39세", "40~49세", "50세 이상"])
     gender = st.selectbox("성별", ["남성", "여성", "기타", "응답 안함"])
@@ -115,7 +145,6 @@ elif st.session_state.step == 2:
         st.session_state.step = 3
         st.rerun()
 
-# Step 3: 감사 페이지
 elif st.session_state.step == 3:
     st.success("🎉 모든 검사가 완료되었습니다! 연구에 큰 도움이 됩니다.")
     st.balloons()
@@ -124,4 +153,4 @@ elif st.session_state.step == 3:
         st.rerun()
 
 st.sidebar.title("AUSTI")
-st.sidebar.caption("Developed by 정인훈 교수 with SuperGrok")
+st.sidebar.caption("Developed by Prof. Jeong In Hun with SuperGrok")
