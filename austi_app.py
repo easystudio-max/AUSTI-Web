@@ -9,7 +9,7 @@ st.set_page_config(page_title="AUSTI - AI 사용 성향 검사", page_icon="🌟
 st.image("https://raw.githubusercontent.com/easystudio-max/AUSTI-Web/main/austi-logo.png", width=320)
 
 st.title("🌟 AUSTI")
-st.subheader("AI 사용 성향 검사")
+st.subheader("AI Usage Style Tendency Indicator Test")
 
 @st.cache_resource(show_spinner="Google Sheets 연결 중...")
 def get_google_sheet():
@@ -42,11 +42,11 @@ if 'step' not in st.session_state:
 # Step 0: 동의 + 기본 정보
 if st.session_state.step == 0:
     st.subheader("📜 연구 참여 동의서")
-    st.write("본 검사는 충북보건과학대학교 글로벌IT학과 정인훈 교수 연구를 위한 것입니다. 모든 데이터는 익명 처리되어 학술 목적으로만 사용됩니다.")
+    st.write("본 검사는 충북보건과학대학교 글로벌IT학과 정인훈 교수팀의 연구에 활용되며, 모든 데이터는 익명 처리되어 학술 목적으로만 사용됩니다.")
     consent = st.checkbox("위 내용을 이해하였으며, 연구 참여에 동의합니다.", value=False)
     
     name = st.text_input("이름 또는 별명", placeholder="예: 인훈")
-    background = st.text_input("직업/전공/분야", placeholder="예: 공간정보공학")
+    background = st.text_input("직업/전공/분야", placeholder="예: IT계열")
     
     if st.button("동의하고 검사 시작하기", type="primary") and consent:
         st.session_state.name = name.strip() if name.strip() else f"익명_{datetime.now().strftime('%H%M%S')}"
@@ -170,4 +170,4 @@ elif st.session_state.step == 4:
         st.rerun()
 
 st.sidebar.title("AUSTI")
-st.sidebar.caption("Developed by 정인훈 교수 with SuperGrok")
+st.sidebar.caption("Developed by Prof. Jeong In Hun with SuperGrok")
