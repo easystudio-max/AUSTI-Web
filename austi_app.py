@@ -4,12 +4,12 @@ from datetime import datetime
 import gspread
 from google.oauth2.service_account import Credentials
 
-st.set_page_config(page_title="AUSTI - AI 사용 성향 검사", page_icon="🌟", layout="centered")
+st.set_page_config(page_title="AUSTI - AI Usage Style Tendency Indicator Test", page_icon="🌟", layout="centered")
 
 st.image("https://raw.githubusercontent.com/easystudio-max/AUSTI-Web/main/austi-logo.png", width=280)
 
 st.markdown("<h1 style='text-align: center; color: #1E88E5;'>🌟 AUSTI</h1>", unsafe_allow_html=True)
-st.markdown("<h3 style='text-align: center; color: #424242;'>AI 사용 성향 검사</h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center; color: #424242;'>AI Usage Style Tendency Indicator Test</h3>", unsafe_allow_html=True)
 st.markdown("---")
 
 @st.cache_resource(show_spinner="Google Sheets 연결 중...")
@@ -32,7 +32,7 @@ if 'step' not in st.session_state:
 # Step 0: 동의 + 기본 정보
 if st.session_state.step == 0:
     st.subheader("📜 연구 참여 동의서")
-    st.write("본 검사는 충북보건과학대학교 글로벌IT학과 정인훈 교수 연구를 위한 것입니다. 모든 데이터는 익명 처리되어 학술 목적으로만 사용됩니다.")
+    st.write("본 검사는 충북보건과학대학교 글로벌IT학과 정인훈 교수팀의 연구에 활용될 수있으며, 모든 데이터는 익명 처리되어 학술 목적으로만 사용됩니다.")
     consent = st.checkbox("위 내용을 이해하였으며, 연구 참여에 동의합니다.", value=False)
     
     name = st.text_input("이름 또는 별명", placeholder="예: 인훈")
