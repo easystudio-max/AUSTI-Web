@@ -29,15 +29,15 @@ def get_google_sheet():
 if 'step' not in st.session_state:
     st.session_state.step = 0
 
-# Step 0: 동의 + 기본 정보
+# Step 0: 동의 + 기본 정보 (교수님 수정 버전 유지)
 if st.session_state.step == 0:
     st.subheader("📜 연구 참여 동의서")
     st.write("본 검사는 충북보건과학대학교 글로벌IT학과 정인훈 교수팀의 연구에 활용될 수있으며, 모든 데이터는 익명 처리되어 학술 목적으로만 사용됩니다.")
     consent = st.checkbox("위 내용을 이해하였으며, 연구 참여에 동의합니다.", value=False)
-    
+   
     name = st.text_input("이름 또는 별명", placeholder="예: 인훈")
     background = st.text_input("직업/전공/분야", placeholder="예: 공간정보공학")
-    
+   
     if st.button("동의하고 검사 시작하기", type="primary") and consent:
         st.session_state.name = name.strip() if name.strip() else f"익명_{datetime.now().strftime('%H%M%S')}"
         st.session_state.background = background.strip()
@@ -45,8 +45,18 @@ if st.session_state.step == 0:
         st.session_state.step = 1
         st.rerun()
 
-# Step 1: 개선된 20문항
+# Step 1: 20문항 + 리커트 척도 설명 (추가 완료)
 elif st.session_state.step == 1:
+    # ==================== 리커트 척도 설명 ====================
+    st.info("""
+    **답변 방식 (1~5점 리커트 척도)**  
+    1점 : 전혀 그렇지 않다  
+    2점 : 그렇지 않은 편이다  
+    3점 : 보통이다  
+    4점 : 그런 편이다  
+    5점 : 매우 그렇다
+    """)
+
     questions = [
         "1. AI에게 지시할 때 세부 단계, 예시, 출력 형식을 구체적으로 지정한다.",
         "2. AI와 자유롭게 대화하면서 새로운 아이디어가 자연스럽게 떠오르는 것을 즐긴다.",
@@ -94,7 +104,7 @@ elif st.session_state.step == 1:
         st.session_state.step = 2
         st.rerun()
 
-# Step 2: 더 풍성하고 재미있는 보고서
+# Step 2: 풍성한 보고서 (16개 타입 모두 포함)
 elif st.session_state.step == 2:
     reports = {
         "PTRS": {"catch": "정밀 실행 신뢰 솔로형", "desc": "당신은 AI를 '완벽한 개인 비서'처럼 다루는 전략가입니다. 한 번 지시하면 끝까지 철저하게 완성합니다.", "strength": "• 압도적인 정확도와 완성도\n• 혼자서도 체계적으로 일할 수 있는 능력", "weakness": "• 여러 AI를 동시에 다루는 데 익숙하지 않을 수 있음", "tools": "Claude 4 + GPT-4o + Cursor + Perplexity", "tools_reason": "Claude 4와 GPT-4o는 정밀 작업의 최강자, Cursor는 코딩 작업 시 최고, Perplexity는 사실 확인에 최적", "growth": "가끔 Gemini나 Grok을 불러서 'Swarm 모드'로 협업 연습을 해보세요. 생각보다 재미있을 거예요!"},
